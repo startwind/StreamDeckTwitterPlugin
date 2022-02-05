@@ -1,0 +1,8 @@
+{
+  "Description": "Stoppe die Zeit",
+  "Name": "Stoppuhr",
+  "com.elgato.counter.action": {
+    "Name": "Stoppuhr",
+    "Tooltip": "Wie oft wurdest du heute schon gepwnt? Dieser Zähler sagt es dir."
+  }
+}

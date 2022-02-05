@@ -1,0 +1,41 @@
+{
+  "Actions": [
+    {
+      "Icon": "actionIcon", 
+      "Name": "Twitter",
+      "States": [
+        {
+          "Image": "actionDefaultImage",
+          "TitleAlignment": "middle", 
+          "FontSize": "14"
+        }
+      ], 
+      "SupportedInMultiActions": false,
+      "Tooltip": "How many times did you get pwned today? Keep track with this counter.",
+
+      "UUID": "com.startwind.twitter.action"
+    }
+  ], 
+  "SDKVersion": 2,
+  "Author": "Startwind",
+  "CodePath": "code.html",
+  "PropertyInspectorPath": "pi/main_pi.html",
+  "Description": "Track the number of times you press a key.", 
+  "Name": "Twitter Follower",
+  "URL": "https://www.startwind.io",
+  "Version": "1.0",
+  "OS": [
+    {
+        "Platform": "mac", 
+        "MinimumVersion" : "10.11"
+    },
+    {
+        "Platform": "windows", 
+        "MinimumVersion" : "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
+}

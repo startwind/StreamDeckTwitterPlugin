@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>com.startwind.twitter</title>
+    <meta charset="utf-8"/>
+</head>
+
+<body>
+<script>
+
+    var websocket = null;
+    var pluginUUID = null;
+
+    var DestinationEnum = Object.freeze({"HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2})
+
+    var followerCount = null;
+
+    var plusIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAASKADAAQAAAABAAAASAAAAACQMUbvAAAEgklEQVR4Ae2aQWgUVxjH/29nk02jCVoTMSkSY4ggCNZWW4NCgp6KehIvRs9ePOXgpdceigdPUnoo9NDYHgoeWnJqxRQULVWCQQi6xBiECDGYsB5ck50Z55udRayz+711v7fJ4ftgCJnvzfv+8+N7b99735j2roEQalUJZKp61BETUEBMIiggBcQQYNyaQQqIIcC4NYMUEEOAcWcZv1N3+Ekn/L3D8AcPI9zai7BjO8LO7jimKbyAebUIs7wAL38X3sw/MK8LTvWkdW7WYyVd2nccpSOjCPq/BDJemq4P7wU+MnP3kb19DdmHNz70O7rTVED+rgNYOzGGoO9AQ6+TmZ9Cy8QVeE+nGurH5uGmAApNBmunLqF09JyNJus22VvjaPnzMkwYWD9Tb0PngMK2Drw5fwXB4FC92qzaZ/J3kPtlDKb4yqp9vY2cAiI4xYvXEG7fXa+uutqbxSdouzrqBJKzdRANK8oc13CIJMWIY0UxpU2+x0QhzTmuhlUaBIpFMaXNCSD6tZKekG1enGJSbElzAoh+ytfLpGOLA6JFYKPrnEbgUmzSIGXygKIVsgvb02nwdVf52parHYFW6VImuhejvVW8fZBSl/RzcJvBrROtyHkmvnN2chW/zVVfHJIG0iKxdxPNIH/viNXeav9Wg9Hdmfjauak2zc/agevH3sGp3TrxRvu7WItV49qNZAHtOVw7WuI90+9hfLg1vg51pUsY2ZHBD0NZ5E/nsHNzOXOsOk8a+ZZauD5lh9iWHi6elb8t2uDf/KbVqm21RqGQFllA0XlONfv8U4Nckiw0bCo2mEy+9P/yKvC48H4dc/plgPFZH5cPtVQesfpLZ0sSJgsoOexKE/bH8dbUofL9wXcvPvHMx8m/1+LH7y4G+PFRCb/OBhjpSR+GaXEq9yoHb5X/P/avKKBoV/SxOt57rugDQxNROjVkMlpEAZnCEsLu9J+l6eUAi8XyZNvbbtATXWSzhQArCYv8/4ZXI3xIi4TJAorOkMPuvlRdlaFDzu++yOLb/eXQl+6VcH2++pomtTOLm3SeLWH1D+4aUemAfaOYlBZRQF7+343CJ66ESIgRHWLezCQQVR+4SsXvcz5mVsrD6r8l+eFFGqhMJGGigGjvQ6WZYOCrmtoeLIegy5WRBol9GOkTBRR3GNWtVhlA9YL5ayGA+blo/RjVzqRMdA4iUVTUo7rVehnFliwsigMiMFTUWy+Tju0EEFU8qajXbKOY0tVWJ4AIDFU8qajXLKNYFFPanAGicnBc8YyKeq6NCodxLAclaGeACAqVg6ni6TKTqG9XVVV6B6eAKpByP11wMifRnEN9u6rLx/qb+X2Qfv5CyC1MP6CygERNyp/gjYAO2OkMOfUTvJXn8B7TJ3iTYtsHS3lxM6efv9QjZKO2dT5Jb9QXt9WlgBhSCkgBMQQYt2aQAmIIMG7NIAXEEGDcmkEKiCHAuDWDFBBDgHFrBikghgDj1gxSQAwBxq0ZpIAYAoxbM0gBMQQYt2aQAmIIMG7NIAXEEGDcmkEKiCHAuN8CCTBS6/tiJRcAAAAASUVORK5CYII='
+    var defaultIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAYAAADnRuK4AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAkKADAAQAAAABAAAAkAAAAAA/PwqIAAAQBElEQVR4Ae1dCZAV1RW93f37/xn2kU1AkEXQIO6ouFQsUkg0WopLTLkkpGKIlliUVmUxJrGsxCwmLiSW0So0xn2XuGs0LgEFFYiCYonDIqLAIJsCM3/p7pz7ekb+LMzwp/v/vm/mveIz/ft3v77v3tPv3XfvffdZPQaMCcgUw4FOcsDu5H3mNsMBxQEDIAOESBwwAIrEPnOzAZDBQCQOGABFYp+52QDIYCASBwyAIrHP3GwAZDAQiQMGQJHYZ242ADIYiMQBA6BI7DM3GwAZDETigAFQJPaZmw2ADAYiccAAKBL7zM0GQAYDkThgABSJfeZmAyCDgUgcMACKxD5zswGQwUAkDhgARWKfuTllWFAmDrjVFGSqiWyw2C+Qla0nyuPTxYoBUFwCTVeRN+oo8g84jvz9Dia/ZghRVS8AyAGAPKKGnWRvW0/2Z8vJXvEmOauXEOV2RXy6hfuTXZVlmXVh0WQY9KyhwrHnkjdxGvmDDyBKMWAgVAZNgL/8sSBo/jCYbPwteGTVraLUoicp9dYjZO3YUhIRQZ9B5B08mVLvPIm6Gkq6N+6LDYAicLRw1BmUP2UWBYNGKlCQl9/72hxXgc2q+4Tcf98KMDzR4b1B30FUmHgWFSZPJ2fRM5T+1x86vKfcF4gEUICuP3/qleQ+fzNZDTvKzYOS6w8yPSh/5tVUOO576Gl8Kgk4LZ/GQELPlHr7cXLnXof2ftX8CidF/vBDqXDkaeQd+m0K9tmXaMd2qr7hTLK2rGt+bQLfROpA3sFTqDB1OgXVvSnz0C/D4SAB5rT1yKBnP8pddBN5479JlM3ikog6CPdaXoEKk85RelPm/p/iu0f+0IPIH3sceQceT/6+BxJlMlDCcS0e5867VwR4mD/yAGTZ0CnOhtIZkHfM2ZTbuZXST/6xLVlW/ly6mnIX3tgInjh1D6Ai26AU8IbLH4JUUhT0GRzqUx56uAKAg9/JzZC99gNKvXZn5du+hyeKA5A/cCT5Iw4F03LqbStMvpisfAO5z928hyZU7nTujKvIm3ASwB0neIroL2QpqBmKEwCU6pmKdCoMZdau7ZR+9Ddk1bcY5oqqqPShOEOiP/LIcPrLsxdmZD5L+ZNnUv70n4UzmUpzqPF5rH8Ujj+/cdgqIxGwGakZXPEjAB7ycpTGcG6vXVr8CwU9+qFnqmp2rpJf5PVA+40HUIpYwEDCm5mfconSidJzf6++F11R9kPWxXKnXoHngBYF7LI/cvcDMGzxND/94C/IWf5aeD7lkj9sPPEskE0G6Wdv2H19hY/EASjYZziY0oILLLRcAxVOvAC6wSBKP/xrMPWLFheV76t31DQKho4N9ZDyPaZ1zdAHbRgc08/8hayt6zELm0re6KPJ5w9eNOurTVQ1+zz00mUaUltT1OqMMABZ6JJ74y1viaBGuqFIeodMoWzNMEo/cjW682WtGhT7CSdNBSjzPDOqbGGDI8+6fMqddQ35/YcRVffFlB9U4H0imDfSd18BYH1WWbJaPE2WDqSstR1gGj0RT3Gzl9xFhRMuaNGc+L/6wyfgeZhGF6CbVLQAJY5DrBP6Q8dBz4FfjXuaPCYXmGCkH72GnFXvVJSith4mC0Dc80Bpbq4EtUE2z1YyPSl37m8pO/1vFPTHsFem4o2bBOGlUTu/9gmURjuR6pVtiAvDGuuBqcVPJUBM60fKAhDos3ZsDv1FrWltfoZ9TXgjvSO+Qw2zHkJvdBHeWBZ0vMUffkhrnSzeR+xdbezVR0k/8TtKvXH/3t1TgavEAciuW91hB9SMLxjSgp79Kffda6nhsnvJ+8ZJzX6O9AWznQD6VqtpdaRKO3FzCi8GPPfpB34uCjzcEnkA+hR2DvZml1LYdsK60agjKXvx7ZSdMYe8cSeghmJ7QCkVhtcG6R7KdLBHpb70Kku/A34y9txXzZlBqSXPlH5/me/oQGMt89PbqN5e8x5Z2zdS0Kt/6W8+dCMGjTd+MnxIJ5Kz8m1KLXyE7A9f75xTVoVfuG1QWaFT0Hcou4syd80ke+PKCj20tMeIAxDbdzjgiv1glOvM1Bm9l7KLAEjjjlc9kVW3klJLXyJn2YsI6PoQU/K9nFGxpz3oDA2lCaG9qy2OZhQYkdBEszgAMWHugoehHJ+OIx6CShzOuAJVGEjcI6GGAftTfuqllD9pOtnrPyZnxRtkf7xQgcnauedgLgtvP9tbqO++qCUZIAVNgWiqJfL+Ewkge80Sct5/Wc2wWLeJXLjH4Q+GBGXXGQln7bdmkPVlHdkbaslet5ys9R+RvWkNzm2E0/LLsBeD/8ne/Cl5Q2AHKiVYLDLBuyuw2Aq/J8Pq7ssSOxIJIPY3uc/PRnjDpFCJ5Sl7HIWFwV7+xhEs6D2QvH5DwvAM7ugAVuXprt8GcwI+u7aRP2hUYuBRHXAT+ONofxnqkAkgNNTGzMN9+nrKnf+n8A1k4cddGJjNwMmuFLgLetUgTBUKLCux3PM0uyZuItqrj90ZGIYbh+L2rkzqN1nTeB7vi4oK83zpNljPEI3X4reiy2I8bBwu+K3nnoqV8cTAg2YBwKxAWwkHzrfHYFEACuAszE37lfL/gHuKbve5m8h98VZYmTGd5h6hOxVuL4ZR5VQV2m5ZQxiUVu+wUxC2cSEpRRr2G2fVEkrNuw+M3E6Fky8jNu5JVipjlTOWAFnbNsRaZdyViQKQhbFeGRExbfZHH4ug8klwPueUMmttrwtnUp2e1sfNugrUh06YZ4GSi6wxAfqG9cXa0JnKyiMHkkN55rBNf9hBmJH1Ud8lMzRW2qCS2RtXxVpl3JXJAhBa53zybpP609jWIsVWsD0kbsGoSQMMmVZdbexVx1mhOADZtW8R1cMCXJFZV5ysjLkuC05UDNvW5nUxVxxvdfIAtBGW4bXohTiEoTsXrMSwN6xAVo+dorkgDkBsd3HfxOK65iYh0UwsC3GQjL1qUVmqjrNSeQBC65xlL5Ndi3hfLGnpngVvDyYQzsrkY5474r9IAKlFdM/eqHxT3c54yBLj4WvTakQOrOhIfon/LhNAYIu9ejEs0LfAjcG6UDcbz5BjyP5ofugHSxwi7RMgFkBMtvvaHZSa/0CYmaLbgAgvC4ynHACnQxENIM69k56LVQjzH2x0qMomNxaBI5Df/hxp8NZVYNFkDATLlwhWZ6Yfu4bcp66HZxyhFQkmEoiB3x1X4djkcPA8r0rVoMgHEDORA8xemUNVt/0QoagLYCPC7IyB1NW887wCY1sdpd59TgPohCQ6bo99rtWFWvZMc2JK7uIJyZ6IV26oqX4Zgs2SYArinlILHwWAnk/i6Z16psgcia1akqrC4sG+YawyQj5UkBd6IA/rwDjxgTdhKqZtyICqs6eee1MEjlXNPle8A7VYPqLCOYoJKz4O8GZmZ9yBWKDqxiSUCD3lJN6ZXmF8EK8Z1xk83FiYK1JvP6YVeJhsLQDEqd3s2gVUmPIjCrJNAfYYttS6rT2kguHW6VLwAlhfbSX31X/oQvHXdOqhRINcd/59UDC3oqMBYIozVnzdFI0PkP2DEyZYX6zRrhHaAIgDzVLz7gGSElxqXA7xItbb2oCs9f+9qxy1l71ObQDEnHCR3tZeuRj6AqbwXaLA6ox/afj9rJ3btWyRVgDiRAPph69GWrfPu0a8EJKHO0gU5Sx9UUvwMNF6AYgJRpaKzN1XhomodA73gMvC2riG0k//WVvwaAkgRfSaxZSZ8xMIAPHCGR7ONPPWK5tPgdKPX4u1+JsMgJLggP3pMqr6+/dhO5mL+BkYEZWPTBMgYdblvvBXcjhkQ/OilSujJa85/Yqz7CV4rt+noO9A7GQzDBopRzE2AUmgiwM9ZmrhYyr3s/bGT+Z0l9lwDsOCN3qi2hLJH4NE3AwmWKqVkHitu4QC8DjL51HmnzNV5jEJJEWloesAqJgTnBwTq1tV+hZsl5Sf/GMMc7AflSPDR/Fz2zuG6cFe/T/K3HlpOAFo71qNftNuFrZXvEUsjYUlwWqHv6PPCqf8SYPnk6XoeS7vUuBhWWjhC9sr0BRd5A8chR0PZ5F3+Gmhv4yzuCZVMGzZtYsoc88stVAwKTLK9dwuBaCg9wC1JVPhhAuxKcsAxBZzjsSkFGko8mwoXPoydtq5SiWIKJcQk6y3SwCItzooYNfkwjHnIKHmfkgMhXDQOHIrdlYyHJuEpTmp1++m9FMwFKr0w52tTPZ92gJIZewYM5EKh51KPnJCB30QnZjHUMUZPZIssEdx+ImLLZpSC7DCtosXAQBim00HwwzeaAYM9zScZZWn6/7+R4TbQ/I+7LyDTdLAYesygsLsVYuxn8V1xIbO7lCSBxCsyN6Ek8kbe6yyjahkApyZA9sbBT36IGP9ADWbCvoORlhrTWgoZLzxqgURQwNoZeMl9jF1/3O7Cv6nXH13wI5qY/IAgpHP+eAVCmC7yU+dScGIMQgYA238YaCoD4LIONklRyAm3dMotjX+x85c0MTWcPeFW5C4HMH+3azIMiQi5rlw9DTKn/gDCoaMDQHD2VIlFe4deVkRIiM5e4b76hy8AK9KorCitMgCUGPTg6peyFJ/GvaPP0/pPMpZykNWkil3eb8uF59sPTm12MTlzQfCTXCTpKmiUGn7YSIB9DWpGNY8ZKvn3Yl9bN/ElmVVKgIm9DTs5ectt7H9lLV5rQJMagnWpcGqbErIAdkAKpISg0ftvoOtnPwRh1PQbzCGEhYuLmJLc6QVGgALD03KfgPQ4JB1LWvLOnJWL1JDFA9XPD03pTkHtAFQMdlBT2Rtxca7PJX3R2BT3EGjleNUed8ZVAwALqyANxU+bjrf9Jd/YwAiI71V/yVcDRuQVo5T7C3D5z0cfwyDZPeZUTE7Si1aAqhVI3nKD9eFj41TgpqhGOoQG4RtMKmqd7gA0YYnnu1F3EsxWDj7KTLAWzu2qETeDBxr23r1PVE9q1XD5J/oGgCSz+cuS2HXDOfosuKS1zADIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKIgMgrcQlj1gDIHky0YoiAyCtxCWPWAMgeTLRiiIDIK3EJY9YAyB5MtGKov8D/C6qHMShHzUAAAAASUVORK5CYII='
+
+    var twitterHandle = 'sddevclub'
+
+    var twitterAction = {
+
+        type: "com.startwind.stopwatch.action",
+
+        onKeyDown: function (context, settings, coordinates, userDesiredState) {
+            twitterAction.SetImage(context, defaultIcon)
+            twitterAction.OpenUrl('https://twitter.com/' + twitterHandle)
+        },
+
+        onWillAppear: function (context, settings, coordinates) {
+            twitterAction.fetchTwitterStats(context)
+            setInterval(function () {
+                twitterAction.fetchTwitterStats(context)
+            }, 1000 * 60);
+
+            twitterAction.SetImage(context)
+        },
+
+        fetchTwitterStats: function (context) {
+            var fetchUrl = 'https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=' + twitterHandle
+            fetch(fetchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    var currentCount = data[0].followers_count
+                    twitterAction.SetTitle(context, data[0].followers_count);
+
+                    if(currentCount > followerCount && followerCount != null) {
+                        twitterAction.SetImage(context, plusIcon)
+                        setTimer(function () {
+                            twitterAction.SetImage(context, defaultIcon)
+                        }, 1000 * 30);
+                    }
+
+                    followerCount = currentCount
+                })
+        },
+
+        SetTitle: function (context, timeInSeconds) {
+            var json = {
+                "event": "setTitle",
+                "context": context,
+                "payload": {
+                    "title": "\n\n\n" + (timeInSeconds),
+                    "target": DestinationEnum.HARDWARE_AND_SOFTWARE
+                }
+            };
+
+            websocket.send(JSON.stringify(json));
+        },
+
+        SetImage: function (context, icon) {
+            var json = {
+                "event": "setImage",
+                "context": context,
+                "payload": {
+                    "image": icon,
+                    "target": 'hardware',
+                }
+            };
+
+            websocket.send(JSON.stringify(json));
+        },
+
+        OpenUrl: function (url) {
+            var json = {
+                "event": "openUrl",
+                "payload": {
+                    "url": url
+                }
+            };
+
+            websocket.send(JSON.stringify(json));
+        },
+    };
+
+    function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
+        pluginUUID = inPluginUUID
+
+        // Open the web socket
+        websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+
+        function registerPlugin(inPluginUUID) {
+            var json = {
+                "event": inRegisterEvent,
+                "uuid": inPluginUUID
+            };
+
+            websocket.send(JSON.stringify(json));
+        }
+
+        websocket.onopen = function () {
+            // WebSocket is connected, send message
+            registerPlugin(pluginUUID);
+        };
+
+        websocket.onmessage = function (evt) {
+            // Received message from Stream Deck
+            var jsonObj = JSON.parse(evt.data);
+            var event = jsonObj['event'];
+            var context = jsonObj['context'];
+
+            if (event == "keyDown") {
+                var jsonPayload = jsonObj['payload'];
+                var settings = jsonPayload['settings'];
+                var coordinates = jsonPayload['coordinates'];
+                var userDesiredState = jsonPayload['userDesiredState'];
+                twitterAction.onKeyDown(context, settings, coordinates, userDesiredState);
+            } else if (event == "willAppear") {
+                var jsonPayload = jsonObj['payload'];
+                var settings = jsonPayload['settings'];
+                var coordinates = jsonPayload['coordinates'];
+                twitterAction.onWillAppear(context, settings, coordinates);
+            }
+        };
+    }
+
+
+</script>
+
+</body>
+
+</html>
