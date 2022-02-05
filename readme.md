@@ -9,12 +9,13 @@ used to feed Twitter buttons.
 
 ## Release Notes
 
-- *0.1 Proof of Concept*
+- **Version 0.1 - Proof of Concept**
     - Data is fetched every minute via the Twitter API.
     - Twitter handle is hard coded
     - If the follower number increases 30 seconds long a new image will be shown
 
-## Future
+## Future / Ideas
 
 - Use [Property Inspector](https://developer.elgato.com/documentation/stream-deck/sdk/property-inspector/) to set the
   Twitter handle
+- Play sound if the number of followers increases
