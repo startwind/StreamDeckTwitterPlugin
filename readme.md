@@ -13,6 +13,7 @@ used to feed Twitter buttons.
     - Data is fetched every minute via the Twitter API.
     - Twitter handle is hard coded
     - If the follower number increases 30 seconds long a new image will be shown
+    - Click on the button open the Twitter profile page
 
 ## Future / Ideas
 

@@ -11,16 +11,14 @@
         }
       ], 
       "SupportedInMultiActions": false,
-      "Tooltip": "How many times did you get pwned today? Keep track with this counter.",
-
+      "Tooltip": "Number of Twitter followers",
       "UUID": "com.startwind.twitter.action"
     }
   ], 
   "SDKVersion": 2,
   "Author": "Startwind",
   "CodePath": "code.html",
-  "PropertyInspectorPath": "pi/main_pi.html",
-  "Description": "Track the number of times you press a key.", 
+  "Description": "Show number of Twitter followers",
   "Name": "Twitter Follower",
   "URL": "https://www.startwind.io",
   "Version": "1.0",
